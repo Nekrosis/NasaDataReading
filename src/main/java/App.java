@@ -13,27 +13,32 @@ public class App {
     private final String URL = "https://api.nasa.gov/planetary/apod?api_key=YBqWT0YJFV82R6SiG27DMqjIM1SXCjuujjdXvNwX";
     private String image;
 
-    public void nasa(CloseableHttpClient httpClient) throws IOException {
-        HttpGet get = new HttpGet(URL);
-        CloseableHttpResponse response = httpClient.execute(get);
-        ObjectMapper mapper = new ObjectMapper();
-        NasaService nasaService = mapper.readValue(response.getEntity().getContent(), new TypeReference<NasaService>() {
-        });
+    public void nasa(CloseableHttpClient httpClient) {
+        try {
+            HttpGet get = new HttpGet(URL);
+            CloseableHttpResponse response = httpClient.execute(get);
+            ObjectMapper mapper = new ObjectMapper();
+            NasaService nasaService = mapper.readValue(response.getEntity().getContent(), new TypeReference<NasaService>() {
+            });
 //TODO: Запись картинки->
-        image = nasaService.getUrl();
-        String[] fir = image.split("/");
-        String name = fir[fir.length - 1];
-        HttpGet get1 = new HttpGet(image);
-        CloseableHttpResponse httpResponse = httpClient.execute(get1);
-        File file = new File("/Users/macbookpro/Downloads", name);
-        HttpEntity http = httpResponse.getEntity();
-        InputStream inputStream = http.getContent();
-        FileOutputStream fos = new FileOutputStream(file);
-        byte[] body = inputStream.readAllBytes();
-        fos.write(body);
+            image = nasaService.getUrl();
+            String[] fir = image.split("/");
+            String name = fir[fir.length - 1];
+            HttpGet get1 = new HttpGet(image);
+            CloseableHttpResponse httpResponse = httpClient.execute(get1);
+            File file = new File("/Users/macbookpro/Downloads", name);
+            HttpEntity http = httpResponse.getEntity();
+            InputStream inputStream = http.getContent();
+            FileOutputStream fos = new FileOutputStream(file);
+            byte[] body = inputStream.readAllBytes();
+            fos.write(body);
+            fos.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
         CloseableHttpClient httpClient = HttpClientBuilder.create()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setConnectTimeout(5000)
